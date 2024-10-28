@@ -1,9 +1,11 @@
 # Poker Range Manager
-A React-based web application for No Limit Hold'em poker players to create and manage hand ranges. The MVP focuses on RFI (Raise First In) situations from all positions in a 6-max format game, including Big Blind defense ranges.
+
+A Next.js-based web application for No Limit Hold'em poker players to create and manage hand ranges. The MVP focuses on RFI (Raise First In) situations from all positions in a 6-max format game, including Big Blind defense ranges.
 
 ## Features
 
 ### MVP Features
+
 - 📊 Interactive hand range grid for RFI situations
 - 🎨 Color-coded (customizable) actions:
   - Raise (red)
@@ -20,6 +22,7 @@ A React-based web application for No Limit Hold'em poker players to create and m
 - 🖥️ Desktop-first responsive design
 
 ### Future Features (Post-MVP)
+
 - 🔐 User authentication
 - ☁️ Cloud storage
 - 📤 Import/Export functionality
@@ -29,15 +32,22 @@ A React-based web application for No Limit Hold'em poker players to create and m
 - 🔄 Undo/Redo functionality
 
 ## Tech Stack
+
 - Frontend:
-  - React
+  - Next.js 15
+  - React 19
   - Context API for state management
   - Tailwind CSS
   - Local Storage for data persistence
 
 ## Project Structure
+
 ```
 src/
+├── app/
+│   ├── layout.jsx
+│   ├── page.jsx
+│   └── globals.css
 ├── components/
 │   ├── Grid/
 │   │   ├── Grid.jsx
@@ -55,30 +65,38 @@ src/
 │   ├── positions.js
 │   ├── actions.js
 │   └── colors.js
-├── utils/
-│   ├── storage.js
-│   └── handUtils.js
-└── App.jsx
+└── utils/
+    ├── storage.js
+    └── handUtils.js
 ```
 
 ## Installation
+
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/JohanPeraldi/poker-range-manager.git
 ```
+
 2. Install dependencies:
+
 ```bash
 cd poker-range-manager
 npm install
 ```
+
 3. Start the development server:
+
 ```bash
-npm start
+npm run dev
 ```
 
 ## Development Guidelines
+
 ### Commit Message Guidelines
+
 We follow the Conventional Commits specification for commit messages. Each commit message should be structured as follows:
+
 ```
 <type>[optional scope]: <description>
 
@@ -88,6 +106,7 @@ We follow the Conventional Commits specification for commit messages. Each commi
 ```
 
 #### Types
+
 - `feat`: A new feature
 - `fix`: A bug fix
 - `docs`: Documentation only changes
@@ -98,6 +117,7 @@ We follow the Conventional Commits specification for commit messages. Each commi
 - `perf`: Performance improvements
 
 #### Examples:
+
 ```bash
 # Adding new features
 feat: implement hand range grid component
@@ -125,11 +145,13 @@ test(grid): add integration tests for cell selection
 ```
 
 ### Branch Strategy
+
 - `main`: Production-ready code
 - Feature branches: `feature/feature-name`
 - Bug fixes: `fix/bug-name`
 
 Example branch naming:
+
 ```bash
 feature/hand-range-grid
 feature/position-selector
@@ -138,7 +160,9 @@ fix/local-storage
 ```
 
 ## Contributing
+
 This project is currently in development. When contributing:
+
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit your changes following our commit message guidelines
@@ -146,7 +170,9 @@ This project is currently in development. When contributing:
 5. Open a Pull Request
 
 ## License
+
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 ---
+
 Created by Johan Peraldi
