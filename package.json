@@ -2,6 +2,7 @@
   "name": "poker-range-manager",
   "version": "0.1.0",
   "private": false,
+  "type": "module",
   "author": "Johan Peraldi",
   "scripts": {
     "dev": "next dev",
@@ -17,11 +18,12 @@
     "react-dom": "19.0.0-rc-69d4b800-20241021"
   },
   "devDependencies": {
+    "autoprefixer": "^10.4.20",
     "eslint": "^8",
     "eslint-config-next": "15.0.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
-    "postcss": "^8",
+    "postcss": "^8.4.47",
     "prettier": "^3.3.3",
     "tailwindcss": "^3.4.1"
   }

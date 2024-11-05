@@ -7,14 +7,16 @@ import GridCell from './GridCell';
 import ActionSelector from './ActionSelector';
 
 export default function Grid() {
-  const grid = generateHands();
+  const [grid] = useState(() => generateHands());
   const [cellActions, setCellActions] = useState({});
   const [selectedAction, setSelectedAction] = useState(ACTIONS.RAISE);
 
   const handleCellClick = hand => {
-    console.log('Clicked hand:', hand);
-    console.log('Selected action:', selectedAction);
-    console.log('Current cell actions:', cellActions);
+    console.log('Before click:', {
+      hand,
+      currentAction: cellActions[hand],
+      selectedAction,
+    });
 
     setCellActions(prev => {
       const newActions = { ...prev };
@@ -23,7 +25,8 @@ export default function Grid() {
       } else {
         newActions[hand] = selectedAction;
       }
-      console.log('New cell actions:', newActions);
+
+      console.log('After click:', { hand, newAction: newActions[hand] });
       return newActions;
     });
   };
