@@ -7,13 +7,12 @@ module.exports = {
   ],
   safelist: [
     'bg-red-800',
-    'bg-red-900',
     'bg-blue-200',
-    'bg-blue-300',
     'bg-gray-300',
-    'bg-gray-400',
     'text-white',
     'text-gray-800',
+    'bg-[#f5f7f5]',
+    'bg-[#eef2ee]',
   ],
   theme: {
     extend: {

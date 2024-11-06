@@ -1,3 +1,31 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-white text-gray-900;
+  }
+}
+
+@layer components {
+  .grid-cell {
+    @apply aspect-square 
+           border 
+           border-gray-300 
+           flex 
+           items-center 
+           justify-center 
+           cursor-pointer 
+           text-sm 
+           hover:brightness-95;
+  }
+
+  .action-button {
+    @apply px-4 
+           py-2 
+           rounded 
+           font-medium 
+           hover:brightness-95;
+  }
+}

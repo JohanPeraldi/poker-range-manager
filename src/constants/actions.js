@@ -1,3 +1,5 @@
+import { ACTION_COLORS } from './colors';
+
 export const ACTIONS = {
   NONE: null,
   RAISE: 'RAISE',
@@ -7,7 +9,7 @@ export const ACTIONS = {
 
 // Background colors for the action selector buttons and cells
 export const COLORS = {
-  RAISE: 'bg-red-800',
-  CALL: 'bg-blue-200',
-  FOLD: 'bg-gray-300',
+  RAISE: ACTION_COLORS.RAISE,
+  CALL: ACTION_COLORS.CALL,
+  FOLD: ACTION_COLORS.FOLD,
 };

@@ -11,12 +11,14 @@ export default function ActionSelector({ selectedAction, onActionSelect }) {
         .map(action => {
           const bgColor = COLORS[action];
           const textColor = getContrastText(bgColor);
+          const isSelected = action === selectedAction;
 
           return (
             <button
               key={action}
-              className={`px-4 py-2 rounded ${bgColor} ${textColor} hover:brightness-95`}
+              className={`action-button ${bgColor} ${textColor} ${isSelected ? 'ring-2 ring-offset-2 ring-gray-400' : ''}`}
               onClick={() => onActionSelect(action)}
+              aria-pressed={isSelected}
             >
               {action.charAt(0) + action.slice(1).toLowerCase()}
             </button>

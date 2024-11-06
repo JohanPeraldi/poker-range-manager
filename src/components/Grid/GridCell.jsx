@@ -1,26 +1,26 @@
 'use client';
 
+import { GRID_COLORS, TEXT_COLORS } from '@/constants/colors';
 import { COLORS } from '@/constants/actions';
 import { getContrastText } from '@/utils/colorUtils';
 
 export default function GridCell({ hand, action, onClick }) {
   const isPocketPair = hand.length === 2 && hand[0] === hand[1];
 
-  const baseClass =
-    'aspect-square flex items-center justify-center cursor-pointer border border-gray-300';
+  const baseClass = 'grid-cell';
   const bgClass = action
     ? COLORS[action]
     : isPocketPair
-      ? 'bg-[#f5f7f5]'
-      : 'bg-[#eef2ee]';
-  const textClass = action ? getContrastText(bgClass) : 'text-gray-800';
+      ? GRID_COLORS.POCKET_PAIR
+      : GRID_COLORS.OFFSUIT;
+  const textClass = action ? getContrastText(bgClass) : TEXT_COLORS.DARK;
 
   return (
     <div
-      className={`${baseClass} ${bgClass} ${textClass} hover:brightness-95`}
+      className={`${baseClass} ${bgClass} ${textClass}`}
       onClick={() => onClick(hand)}
     >
-      <span className="text-sm">{hand}</span>
+      <span>{hand}</span>
     </div>
   );
 }
