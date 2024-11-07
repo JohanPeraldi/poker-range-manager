@@ -6,7 +6,8 @@ export default function Home() {
       <h1 className="text-3xl font-bold mb-8 text-center">
         Poker Range Manager
       </h1>
-      <Grid />
+      {/* Toggle testMode to true to simulate localStorage errors */}
+      <Grid testMode={false} />
     </main>
   );
 }
