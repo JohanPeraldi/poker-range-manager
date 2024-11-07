@@ -4,10 +4,16 @@ import { GRID_COLORS, TEXT_COLORS } from '@/constants/colors';
 import { COLORS } from '@/constants/actions';
 import { getContrastText } from '@/utils/colorUtils';
 
-export default function GridCell({ hand, action, onClick }) {
+export default function GridCell({
+  hand,
+  action,
+  onMouseDown,
+  onMouseEnter,
+  onMouseUp,
+}) {
   const isPocketPair = hand.length === 2 && hand[0] === hand[1];
 
-  const baseClass = 'grid-cell';
+  const baseClass = 'grid-cell select-none';
   const bgClass = action
     ? COLORS[action]
     : isPocketPair
@@ -18,7 +24,9 @@ export default function GridCell({ hand, action, onClick }) {
   return (
     <div
       className={`${baseClass} ${bgClass} ${textClass}`}
-      onClick={() => onClick(hand)}
+      onMouseDown={onMouseDown}
+      onMouseEnter={onMouseEnter}
+      onMouseUp={onMouseUp}
     >
       <span>{hand}</span>
     </div>
