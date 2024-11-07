@@ -16,15 +16,32 @@ export default function PositionSelector({
   onPositionSelect,
 }) {
   return (
-    <div className="mb-6">
-      <h2 className="text-lg font-semibold mb-3">Select Position</h2>
-      <div className="flex flex-wrap gap-2">
+    <div className="w-full lg:w-48">
+      <h2 className="text-lg font-semibold mb-3">Position</h2>
+
+      {/* Select element for small screens */}
+      <select
+        value={selectedPosition}
+        onChange={e => onPositionSelect(e.target.value)}
+        className="w-full p-3 rounded-lg border border-gray-300 bg-white 
+                 text-gray-700 font-medium lg:hidden focus:outline-none 
+                 focus:ring-2 focus:ring-blue-500"
+      >
+        {Object.entries(POSITIONS).map(([key, label]) => (
+          <option key={key} value={key}>
+            {key} - {label}
+          </option>
+        ))}
+      </select>
+
+      {/* Button list for desktop */}
+      <div className="hidden lg:flex lg:flex-col gap-2">
         {Object.entries(POSITIONS).map(([key, label]) => (
           <button
             key={key}
             onClick={() => onPositionSelect(key)}
             className={`
-              px-4 py-2 rounded-lg font-medium transition-colors
+              px-4 py-3 rounded-lg font-medium transition-colors text-left
               ${
                 selectedPosition === key
                   ? 'bg-blue-600 text-white'
@@ -33,7 +50,8 @@ export default function PositionSelector({
             `}
             aria-pressed={selectedPosition === key}
           >
-            {label}
+            <span className="font-bold">{key}</span>
+            <span className="ml-2">{label}</span>
           </button>
         ))}
       </div>
