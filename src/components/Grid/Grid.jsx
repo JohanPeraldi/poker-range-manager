@@ -6,10 +6,12 @@ import { ACTIONS } from '@/constants/actions';
 import { saveRange, getRange } from '@/utils/storage';
 import GridCell from './GridCell';
 import ActionSelector from './ActionSelector';
+import ResetControls from '../ResetControls/ResetControls';
 
 export default function Grid({ position = 'BTN', testMode = false }) {
   const [grid] = useState(() => generateHands());
   const [cellActions, setCellActions] = useState({});
+  const [previousActions, setPreviousActions] = useState(null);
   const [selectedAction, setSelectedAction] = useState(ACTIONS.RAISE);
   const [isSelecting, setIsSelecting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -99,6 +101,22 @@ export default function Grid({ position = 'BTN', testMode = false }) {
     setIsSelecting(false);
   };
 
+  // Handle clearing of the grid
+  const handleClear = useCallback(() => {
+    setPreviousActions(cellActions); // Store current state before clearing
+    setCellActions({});
+    handleSave({}); // Save empty state to storage
+  }, [cellActions, handleSave]);
+
+  // Handle undoing the clear action
+  const handleUndo = useCallback(() => {
+    if (previousActions) {
+      setCellActions(previousActions);
+      handleSave(previousActions);
+      setPreviousActions(null);
+    }
+  }, [previousActions, handleSave]);
+
   if (error) {
     return (
       <div className="w-full max-w-3xl mx-auto">
@@ -115,11 +133,17 @@ export default function Grid({ position = 'BTN', testMode = false }) {
 
   return (
     <div className="w-full max-w-3xl mx-auto">
-      <ActionSelector
-        selectedAction={selectedAction}
-        onActionSelect={setSelectedAction}
-      />
-
+      <div className="flex justify-between items-start mb-4">
+        <ActionSelector
+          selectedAction={selectedAction}
+          onActionSelect={setSelectedAction}
+        />
+        <ResetControls
+          onClear={handleClear}
+          onUndo={handleUndo}
+          canUndo={!!previousActions}
+        />
+      </div>
       {isLoading ? (
         <div className="flex justify-center items-center h-96">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
