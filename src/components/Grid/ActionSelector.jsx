@@ -16,7 +16,7 @@ export default function ActionSelector({ selectedAction, onActionSelect }) {
           return (
             <button
               key={action}
-              className={`action-button ${bgColor} ${textColor} ${isSelected ? 'ring-2 ring-offset-2 ring-gray-400' : ''}`}
+              className={`flex items-center justify-center h-10 gap-2 px-4 py-2 action-button ${bgColor} ${textColor} ${isSelected ? 'ring-2 ring-offset-2 ring-gray-400' : ''}`}
               onClick={() => onActionSelect(action)}
               aria-pressed={isSelected}
             >

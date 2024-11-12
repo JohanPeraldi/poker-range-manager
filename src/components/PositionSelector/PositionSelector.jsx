@@ -21,11 +21,14 @@ export default function PositionSelector({
 
       {/* Select element for small screens */}
       <select
+        id="position-select"
+        name="position"
         value={selectedPosition}
         onChange={e => onPositionSelect(e.target.value)}
         className="w-full p-3 rounded-lg border border-gray-300 bg-white 
                  text-gray-700 font-medium lg:hidden focus:outline-none 
                  focus:ring-2 focus:ring-blue-500"
+        aria-label="Select position"
       >
         {Object.entries(POSITIONS).map(([key, label]) => (
           <option key={key} value={key}>

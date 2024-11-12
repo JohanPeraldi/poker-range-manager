@@ -7,8 +7,9 @@ import { saveRange, getRange } from '@/utils/storage';
 import GridCell from './GridCell';
 import ActionSelector from './ActionSelector';
 import ResetControls from '../ResetControls/ResetControls';
+import RangeIOControls from '../RangeIOControls/RangeIOControls';
 
-export default function Grid({ position = 'BTN', testMode = false }) {
+export default function Grid({ position = 'BTN', testMode = false, onImport }) {
   const [grid] = useState(() => generateHands());
   const [cellActions, setCellActions] = useState({});
   const [previousActions, setPreviousActions] = useState(null);
@@ -133,17 +134,29 @@ export default function Grid({ position = 'BTN', testMode = false }) {
 
   return (
     <div className="w-full max-w-3xl mx-auto">
-      <div className="flex justify-between items-start mb-4">
+      {/* Toolbar with responsive layout */}
+      <div className="flex flex-wrap items-start gap-4 mb-4">
+        {/* Action Selector */}
         <ActionSelector
           selectedAction={selectedAction}
           onActionSelect={setSelectedAction}
         />
-        <ResetControls
-          onClear={handleClear}
-          onUndo={handleUndo}
-          canUndo={!!previousActions}
-        />
+
+        {/* Auto-spacing */}
+        <div className="flex-grow"></div>
+
+        {/* Reset and Import/Export Controls */}
+        <div className="flex items-start gap-4">
+          <ResetControls
+            onClear={handleClear}
+            onUndo={handleUndo}
+            canUndo={!!previousActions}
+          />
+          <RangeIOControls onImport={onImport} />
+        </div>
       </div>
+
+      {/* Grid content */}
       {isLoading ? (
         <div className="flex justify-center items-center h-96">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
