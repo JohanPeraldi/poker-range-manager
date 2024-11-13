@@ -1,11 +1,17 @@
+'use client';
+
 import React from 'react';
 import { RotateCcw, Undo2 } from 'lucide-react';
+import { useRange } from '@/contexts/RangeContext';
 
-export default function ResetControls({ onClear, onUndo, canUndo }) {
+export default function ResetControls() {
+  const { resetRange, undoReset, state } = useRange();
+  const canUndo = state.previousState !== null;
+
   return (
     <div className="flex gap-2 mb-4">
       <button
-        onClick={onClear}
+        onClick={resetRange}
         className="flex items-center gap-2 px-4 py-2 text-white bg-red-600 rounded hover:bg-red-700 transition-colors"
         aria-label="Clear grid"
       >
@@ -14,7 +20,7 @@ export default function ResetControls({ onClear, onUndo, canUndo }) {
       </button>
 
       <button
-        onClick={onUndo}
+        onClick={undoReset}
         disabled={!canUndo}
         className={`flex items-center gap-2 px-4 py-2 rounded transition-colors
           ${

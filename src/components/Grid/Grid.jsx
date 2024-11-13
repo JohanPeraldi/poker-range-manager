@@ -1,95 +1,59 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { generateHands } from '@/utils/handUtils';
 import { ACTIONS } from '@/constants/actions';
-import { saveRange, getRange } from '@/utils/storage';
 import GridCell from './GridCell';
 import ActionSelector from './ActionSelector';
 import ResetControls from '../ResetControls/ResetControls';
 import RangeIOControls from '../RangeIOControls/RangeIOControls';
+import { useRange } from '@/contexts/RangeContext';
 
-export default function Grid({ position = 'BTN', testMode = false, onImport }) {
+export default function Grid() {
   const [grid] = useState(() => generateHands());
-  const [cellActions, setCellActions] = useState({});
-  const [previousActions, setPreviousActions] = useState(null);
   const [selectedAction, setSelectedAction] = useState(ACTIONS.RAISE);
   const [isSelecting, setIsSelecting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+
+  const {
+    state,
+    updateHandAction,
+    resetRange,
+    loadRange,
+    state: { selectedPosition, ranges, error },
+  } = useRange();
 
   // Load saved range when component mounts or position changes
   useEffect(() => {
     const loadSavedRange = async () => {
       try {
         setIsLoading(true);
-        setError(null);
-
-        if (testMode) {
-          throw new Error('Test mode: Simulated localStorage error');
-        }
-
-        const savedRange = await getRange(position);
-        if (savedRange) {
-          setCellActions(savedRange);
-        } else {
-          setCellActions({}); // Reset to empty if no saved range exists
-        }
-      } catch (error) {
-        console.error('Error loading range:', error);
-        setError('Failed to load saved range');
+        await loadRange(selectedPosition);
       } finally {
         setIsLoading(false);
       }
     };
 
     loadSavedRange();
-  }, [position, testMode]);
-
-  // Save to local storage
-  const handleSave = useCallback(
-    async newActions => {
-      try {
-        setError(null);
-
-        if (testMode) {
-          throw new Error('Test mode: Simulated localStorage error');
-        }
-
-        await saveRange(position, newActions);
-      } catch (error) {
-        console.error('Error saving range:', error);
-        setError('Failed to save range');
-      }
-    },
-    [position, testMode]
-  );
+  }, [selectedPosition, loadRange]);
 
   // Handle mouse down to start selection
   const handleMouseDown = hand => {
     setIsSelecting(true);
-    const newActions = { ...cellActions };
+    const currentAction = ranges[selectedPosition]?.[hand];
 
     // Toggle the action
-    if (newActions[hand] === selectedAction) {
-      delete newActions[hand];
+    if (currentAction === selectedAction) {
+      updateHandAction(hand, null);
     } else {
-      newActions[hand] = selectedAction;
+      updateHandAction(hand, selectedAction);
     }
-
-    setCellActions(newActions);
-    handleSave(newActions);
   };
 
   // Handle mouse enter while selecting
   const handleMouseEnter = hand => {
     if (!isSelecting) return;
-
-    const newActions = { ...cellActions };
-    newActions[hand] = selectedAction;
-
-    setCellActions(newActions);
-    handleSave(newActions);
+    updateHandAction(hand, selectedAction);
   };
 
   // Handle mouse up to end selection
@@ -102,22 +66,6 @@ export default function Grid({ position = 'BTN', testMode = false, onImport }) {
     setIsSelecting(false);
   };
 
-  // Handle clearing of the grid
-  const handleClear = useCallback(() => {
-    setPreviousActions(cellActions); // Store current state before clearing
-    setCellActions({});
-    handleSave({}); // Save empty state to storage
-  }, [cellActions, handleSave]);
-
-  // Handle undoing the clear action
-  const handleUndo = useCallback(() => {
-    if (previousActions) {
-      setCellActions(previousActions);
-      handleSave(previousActions);
-      setPreviousActions(null);
-    }
-  }, [previousActions, handleSave]);
-
   if (error) {
     return (
       <div className="w-full max-w-3xl mx-auto">
@@ -127,7 +75,6 @@ export default function Grid({ position = 'BTN', testMode = false, onImport }) {
         >
           <p>{error}</p>
         </div>
-        {/* Still render the grid even if there's an error */}
       </div>
     );
   }
@@ -147,12 +94,8 @@ export default function Grid({ position = 'BTN', testMode = false, onImport }) {
 
         {/* Reset and Import/Export Controls */}
         <div className="flex items-start gap-4">
-          <ResetControls
-            onClear={handleClear}
-            onUndo={handleUndo}
-            canUndo={!!previousActions}
-          />
-          <RangeIOControls onImport={onImport} />
+          <ResetControls onClear={resetRange} />
+          <RangeIOControls />
         </div>
       </div>
 
@@ -171,7 +114,7 @@ export default function Grid({ position = 'BTN', testMode = false, onImport }) {
               <GridCell
                 key={index}
                 hand={hand}
-                action={cellActions[hand]}
+                action={ranges[selectedPosition]?.[hand]}
                 onMouseDown={() => handleMouseDown(hand)}
                 onMouseEnter={() => handleMouseEnter(hand)}
                 onMouseUp={handleMouseUp}

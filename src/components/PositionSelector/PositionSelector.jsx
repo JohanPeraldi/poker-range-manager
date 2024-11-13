@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useRange } from '@/contexts/RangeContext';
 
 const POSITIONS = {
   BTN: 'Button',
@@ -11,10 +12,10 @@ const POSITIONS = {
   BB: 'Big Blind',
 };
 
-export default function PositionSelector({
-  selectedPosition,
-  onPositionSelect,
-}) {
+export default function PositionSelector() {
+  const { state, setSelectedPosition } = useRange();
+  const { selectedPosition } = state;
+
   return (
     <div className="w-full lg:w-48">
       <h2 className="text-lg font-semibold mb-3">Position</h2>
@@ -24,7 +25,7 @@ export default function PositionSelector({
         id="position-select"
         name="position"
         value={selectedPosition}
-        onChange={e => onPositionSelect(e.target.value)}
+        onChange={e => setSelectedPosition(e.target.value)}
         className="w-full p-3 rounded-lg border border-gray-300 bg-white 
                  text-gray-700 font-medium lg:hidden focus:outline-none 
                  focus:ring-2 focus:ring-blue-500"
@@ -42,7 +43,7 @@ export default function PositionSelector({
         {Object.entries(POSITIONS).map(([key, label]) => (
           <button
             key={key}
-            onClick={() => onPositionSelect(key)}
+            onClick={() => setSelectedPosition(key)}
             className={`
               px-4 py-3 rounded-lg font-medium transition-colors text-left
               ${
