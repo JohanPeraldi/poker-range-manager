@@ -1,8 +1,14 @@
 'use client';
 
-import { createContext, useContext, useReducer, useCallback } from 'react';
-import { saveRange as saveRangeToStorage, getRange } from '@/utils/storage';
+import {
+  createContext,
+  useContext,
+  useReducer,
+  useCallback,
+  useState,
+} from 'react';
 import { ACTION_COLORS } from '@/constants/colors';
+import { saveRange as saveRangeToStorage, getRange } from '@/utils/storage';
 
 // Action Types
 const ACTION_TYPES = {
@@ -151,6 +157,7 @@ export const useRange = () => {
 // Provider component
 export const RangeProvider = ({ children }) => {
   const [state, dispatch] = useReducer(rangeReducer, initialState);
+  const [copiedRange, setCopiedRange] = useState(null);
 
   // Action creators using useCallback
   const setSelectedPosition = useCallback(position => {
@@ -253,6 +260,36 @@ export const RangeProvider = ({ children }) => {
     dispatch({ type: ACTION_TYPES.CLEAR_ERROR });
   }, []);
 
+  const copyRange = useCallback(async position => {
+    try {
+      const range = await getRange(position);
+      setCopiedRange({ position, range });
+      return true;
+    } catch (error) {
+      console.error('Error copying range:', error);
+      return false;
+    }
+  }, []);
+
+  const pasteRange = useCallback(
+    async targetPosition => {
+      if (!copiedRange?.range) return false;
+
+      try {
+        await saveRangeToStorage(targetPosition, copiedRange.range);
+        dispatch({
+          type: ACTION_TYPES.UPDATE_RANGE,
+          payload: { position: targetPosition, range: copiedRange.range },
+        });
+        return true;
+      } catch (error) {
+        console.error('Error pasting range:', error);
+        return false;
+      }
+    },
+    [copiedRange]
+  );
+
   const value = {
     state,
     setSelectedPosition,
@@ -263,6 +300,10 @@ export const RangeProvider = ({ children }) => {
     undoReset,
     loadRange,
     clearError,
+    copyRange,
+    pasteRange,
+    copiedRange,
+    canPaste: !!copiedRange?.range,
   };
 
   return (

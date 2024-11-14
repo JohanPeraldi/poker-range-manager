@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { generateHands } from '@/utils/handUtils';
 import { ACTIONS } from '@/constants/actions';
-import GridCell from './GridCell';
-import ActionSelector from './ActionSelector';
-import ResetControls from '../ResetControls/ResetControls';
-import RangeIOControls from '../RangeIOControls/RangeIOControls';
 import { useRange } from '@/contexts/RangeContext';
+import { generateHands } from '@/utils/handUtils';
+import ActionSelector from './ActionSelector';
+import GridCell from './GridCell';
+import CopyPasteControls from '../CopyPasteControls/CopyPasteControls';
+import RangeIOControls from '../RangeIOControls/RangeIOControls';
+import ResetControls from '../ResetControls/ResetControls';
 
 export default function Grid() {
   const [grid] = useState(() => generateHands());
@@ -95,6 +96,7 @@ export default function Grid() {
         {/* Reset and Import/Export Controls */}
         <div className="flex items-start gap-4">
           <ResetControls onClear={resetRange} />
+          <CopyPasteControls />
           <RangeIOControls />
         </div>
       </div>
