@@ -5,8 +5,7 @@ import { RotateCcw, Undo2 } from 'lucide-react';
 import { useRange } from '@/contexts/RangeContext';
 
 export default function ResetControls() {
-  const { resetRange, undoReset, state } = useRange();
-  const canUndo = state.previousState !== null;
+  const { resetRange, undo, canUndo } = useRange();
 
   return (
     <div className="flex gap-2 mb-4">
@@ -20,15 +19,15 @@ export default function ResetControls() {
       </button>
 
       <button
-        onClick={undoReset}
-        disabled={!canUndo}
+        onClick={undo}
+        disabled={!canUndo()}
         className={`flex items-center gap-2 px-4 py-2 rounded transition-colors
           ${
-            canUndo
+            canUndo()
               ? 'text-gray-700 bg-gray-100 hover:bg-gray-200'
               : 'text-gray-400 bg-gray-100 cursor-not-allowed'
           }`}
-        aria-label="Undo clear"
+        aria-label="Undo last action"
       >
         <Undo2 size={16} />
         <span>Undo</span>

@@ -17,7 +17,7 @@ const ACTION_TYPES = {
   UPDATE_RANGE: 'UPDATE_RANGE',
   UPDATE_COLORS: 'UPDATE_COLORS',
   RESET_RANGE: 'RESET_RANGE',
-  UNDO_RESET: 'UNDO_RESET',
+  UNDO: 'UNDO',
   LOAD_RANGE: 'LOAD_RANGE',
   SET_ERROR: 'SET_ERROR',
   CLEAR_ERROR: 'CLEAR_ERROR',
@@ -40,7 +40,7 @@ const initialState = {
     FOLD: ACTION_COLORS.FOLD,
   },
   error: null,
-  previousState: null, // For undo functionality
+  history: {}, // For undo functionality
 };
 
 // Reducer
@@ -53,28 +53,69 @@ const rangeReducer = (state, action) => {
         error: null,
       };
 
-    case ACTION_TYPES.UPDATE_HAND:
-      return {
-        ...state,
-        ranges: {
-          ...state.ranges,
-          [state.selectedPosition]: {
-            ...state.ranges[state.selectedPosition],
-            [action.payload.hand]: action.payload.action,
+    case ACTION_TYPES.UPDATE_HAND: {
+      const { hand, action: handAction } = action.payload;
+      const currentRange = state.ranges[state.selectedPosition] || {};
+      const newRange = { ...currentRange };
+
+      // Store current state in history before updating
+      const positionHistory = state.history[state.selectedPosition] || [];
+      const newHistory = {
+        ...state.history,
+        [state.selectedPosition]: [
+          {
+            ranges: { ...currentRange },
+            type: 'HAND_UPDATE',
+            timestamp: Date.now(),
           },
-        },
-        error: null,
+          ...positionHistory,
+        ].slice(0, 50), // Limit history to 50 entries
       };
 
-    case ACTION_TYPES.UPDATE_RANGE:
+      if (handAction === null) {
+        delete newRange[hand];
+      } else {
+        newRange[hand] = handAction;
+      }
+
       return {
         ...state,
         ranges: {
           ...state.ranges,
-          [action.payload.position]: action.payload.range,
+          [state.selectedPosition]: newRange,
         },
+        history: newHistory,
         error: null,
       };
+    }
+
+    case ACTION_TYPES.UPDATE_RANGE: {
+      const { position, range } = action.payload;
+      const currentRange = state.ranges[position] || {};
+      const positionHistory = state.history[position] || [];
+
+      const newHistory = {
+        ...state.history,
+        [position]: [
+          {
+            ranges: { ...currentRange },
+            type: 'RANGE_UPDATE',
+            timestamp: Date.now(),
+          },
+          ...positionHistory,
+        ].slice(0, 50),
+      };
+
+      return {
+        ...state,
+        ranges: {
+          ...state.ranges,
+          [position]: range,
+        },
+        history: newHistory,
+        error: null,
+      };
+    }
 
     case ACTION_TYPES.UPDATE_COLORS:
       return {
@@ -86,34 +127,56 @@ const rangeReducer = (state, action) => {
         error: null,
       };
 
-    case ACTION_TYPES.RESET_RANGE:
+    case ACTION_TYPES.RESET_RANGE: {
+      const currentRange = state.ranges[state.selectedPosition] || {};
+      const positionHistory = state.history[state.selectedPosition] || [];
+
+      const newHistory = {
+        ...state.history,
+        [state.selectedPosition]: [
+          {
+            ranges: { ...currentRange },
+            type: 'RESET',
+            timestamp: Date.now(),
+          },
+          ...positionHistory,
+        ].slice(0, 50),
+      };
+
       return {
         ...state,
-        previousState: {
-          ranges: {
-            ...state.ranges,
-          },
-        },
         ranges: {
           ...state.ranges,
           [state.selectedPosition]: {},
         },
+        history: newHistory,
         error: null,
       };
+    }
 
-    case ACTION_TYPES.UNDO_RESET:
-      if (!state.previousState) return state;
+    case ACTION_TYPES.UNDO: {
+      const position = state.selectedPosition;
+      const positionHistory = state.history[position] || [];
+
+      if (positionHistory.length === 0) {
+        return state;
+      }
+
+      const [lastState, ...remainingHistory] = positionHistory;
+
       return {
         ...state,
         ranges: {
           ...state.ranges,
-          [state.selectedPosition]: {
-            ...state.previousState.ranges[state.selectedPosition],
-          },
+          [position]: lastState.ranges,
         },
-        previousState: null,
+        history: {
+          ...state.history,
+          [position]: remainingHistory,
+        },
         error: null,
       };
+    }
 
     case ACTION_TYPES.LOAD_RANGE:
       return {
@@ -220,24 +283,27 @@ export const RangeProvider = ({ children }) => {
     }
   }, [state.selectedPosition]);
 
-  const undoReset = useCallback(async () => {
+  const undo = useCallback(async () => {
     try {
-      if (!state.previousState) return;
+      dispatch({ type: ACTION_TYPES.UNDO });
+      const position = state.selectedPosition;
+      const history = state.history[position];
 
-      dispatch({ type: ACTION_TYPES.UNDO_RESET });
-
-      // Persist the restored state
-      await saveRangeToStorage(
-        state.selectedPosition,
-        state.previousState.ranges[state.selectedPosition]
-      );
+      if (history?.length > 0) {
+        await saveRangeToStorage(position, history[0].ranges);
+      }
     } catch (error) {
       dispatch({
         type: ACTION_TYPES.SET_ERROR,
-        payload: `Failed to undo reset: ${error.message}`,
+        payload: `Failed to undo: ${error.message}`,
       });
     }
-  }, [state.selectedPosition, state.previousState]);
+  }, [state.selectedPosition, state.history]);
+
+  const canUndo = useCallback(
+    () => (state.history[state.selectedPosition]?.length ?? 0) > 0,
+    [state.history, state.selectedPosition]
+  );
 
   const loadRange = useCallback(async position => {
     try {
@@ -297,7 +363,8 @@ export const RangeProvider = ({ children }) => {
     updateRangeForPosition,
     updateColors,
     resetRange,
-    undoReset,
+    undo,
+    canUndo,
     loadRange,
     clearError,
     copyRange,
