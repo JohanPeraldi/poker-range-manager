@@ -1,20 +1,30 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import { Clipboard, Copy } from 'lucide-react';
 
 import { useRange } from '@/contexts/RangeContext';
 
-const CopyPasteControls = () => {
+import Message from '../Message/Message';
+
+export default function CopyPasteControls() {
   const { state, copyRange, pasteRange, canPaste, isLoading } = useRange();
   const { selectedPosition } = state;
   const [message, setMessage] = useState(null);
 
-  // Clear message after 3 seconds
+  useEffect(() => {
+    if (message?.type === 'success') {
+      const timer = setTimeout(() => {
+        setMessage(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
   const showMessage = (type, content) => {
     setMessage({ type, content });
-    setTimeout(() => setMessage(null), 3000);
   };
 
   const handleCopy = async () => {
@@ -34,22 +44,19 @@ const CopyPasteControls = () => {
   };
 
   return (
-    <div className="relative">
-      {/* Message toast */}
-      {message && (
-        <div
-          className={`absolute bottom-full mb-2 right-0 w-48 px-4 py-2 rounded-lg text-sm
-            ${
-              message.type === 'success'
-                ? 'bg-green-100 text-green-700'
-                : 'bg-red-100 text-red-700'
-            }`}
-        >
-          {message.content}
-        </div>
-      )}
+    <>
+      {/* Message section */}
+      {message &&
+        createPortal(
+          <Message
+            type={message.type}
+            content={message.content}
+            onDismiss={() => setMessage(null)}
+          />,
+          document.getElementById('message-container')
+        )}
 
-      {/* Controls */}
+      {/* Copy/Paste Controls */}
       <div className="grid grid-cols-2 gap-2 w-full">
         <button
           onClick={handleCopy}
@@ -71,8 +78,6 @@ const CopyPasteControls = () => {
           <span>Paste</span>
         </button>
       </div>
-    </div>
+    </>
   );
-};
-
-export default CopyPasteControls;
+}

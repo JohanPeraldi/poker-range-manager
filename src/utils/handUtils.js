@@ -1,4 +1,7 @@
-// List of all card ranks from highest to lowest
+/**
+ * List of all card ranks from highest to lowest
+ * @type {string[]}
+ */
 export const RANKS = [
   'A',
   'K',
@@ -15,7 +18,10 @@ export const RANKS = [
   '2',
 ];
 
-// Generate all possible hands in a 13x13 grid
+/**
+ * Generates all possible hands in a 13x13 grid
+ * @returns {string[][]} - 2D array representing the grid of poker hands
+ */
 export const generateHands = () => {
   const grid = [];
 

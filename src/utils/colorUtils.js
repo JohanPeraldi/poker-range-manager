@@ -1,7 +1,7 @@
 /**
  * Extracts RGB values from Tailwind color classes
  * @param {string} bgClass - Tailwind background color class (e.g., 'bg-red-500')
- * @returns {Object} RGB values or null if not found
+ * @returns {{r: number, g: number, b: number}|null} RGB values or null if not found
  */
 const getTailwindRGB = bgClass => {
   // Mapping of some Tailwind colors to RGB values
@@ -22,6 +22,10 @@ const getTailwindRGB = bgClass => {
 /**
  * Calculates relative luminance of a color
  * Using the formula from WCAG 2.0
+ * @param {number} r - Red value (0-255)
+ * @param {number} g - Green value (0-255)
+ * @param {number} b - Blue value (0-255)
+ * @returns {number} - Relative luminance value
  */
 const getLuminance = (r, g, b) => {
   const [rs, gs, bs] = [r, g, b].map(c => {
@@ -34,7 +38,7 @@ const getLuminance = (r, g, b) => {
 /**
  * Determines whether text should be light or dark based on background color
  * @param {string} bgClass - Tailwind background color class
- * @returns {string} Tailwind text color class
+ * @returns {string} Tailwind text color class ('text-gray-800' or 'text-white')
  */
 export const getContrastText = bgClass => {
   const rgb = getTailwindRGB(bgClass);

@@ -1,7 +1,7 @@
 /**
  * Validates the structure of imported range data
  * @param {Object} data - The data to validate
- * @returns {Object} - { isValid: boolean, error: string|null }
+ * @returns {{isValid: boolean, error: string|null}}
  */
 export const validateRangeData = data => {
   try {
@@ -58,40 +58,44 @@ export const validateRangeData = data => {
 };
 
 /**
- * Exports all ranges to a JSON file
+ * Exports all ranges to a JSON file for download
  * @param {Object} ranges - The ranges to export
- * @returns {string} - JSON filename
+ * @returns {Promise<string>} - The filename of the exported ranges
+ * @throws {Error} If export fails
  */
-export const exportRanges = ranges => {
-  try {
-    // Create JSON blob
-    const jsonString = JSON.stringify(ranges, null, 2);
-    const blob = new Blob([jsonString], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
+export const exportRanges = async ranges => {
+  return new Promise((resolve, reject) => {
+    try {
+      // Create JSON blob
+      const jsonString = JSON.stringify(ranges, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
 
-    // Create download link
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `poker-ranges-${new Date().toISOString().split('T')[0]}.json`;
+      // Create download link
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `poker-ranges-${new Date().toISOString().split('T')[0]}.json`;
 
-    // Trigger download
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
 
-    // Cleanup
-    URL.revokeObjectURL(url);
+      // Cleanup
+      URL.revokeObjectURL(url);
 
-    return link.download;
-  } catch (error) {
-    throw new Error(`Export failed: ${error.message}`);
-  }
+      resolve(link.download);
+    } catch (error) {
+      reject(new Error(`Export failed: ${error.message}`));
+    }
+  });
 };
 
 /**
  * Imports ranges from a JSON file
  * @param {File} file - The JSON file to import
  * @returns {Promise<Object>} - The imported ranges data
+ * @throws {Error} If import fails or validation fails
  */
 export const importRanges = async file => {
   try {

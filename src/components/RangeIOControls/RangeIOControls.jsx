@@ -1,11 +1,14 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
-import { Download, Loader2, Upload, X } from 'lucide-react';
+import { Download, Loader2, Upload } from 'lucide-react';
 
 import { useRange } from '@/contexts/RangeContext';
 import { exportRanges, importRanges } from '@/utils/rangeUtils';
+
+import Message from '../Message/Message';
 
 export default function RangeIOControls() {
   const fileInputRef = useRef(null);
@@ -23,6 +26,10 @@ export default function RangeIOControls() {
       return () => clearTimeout(timer);
     }
   }, [message]);
+
+  const showMessage = (type, content) => {
+    setMessage({ type, content });
+  };
 
   const getReadableErrorMessage = error => {
     // JSON parsing errors
@@ -52,13 +59,10 @@ export default function RangeIOControls() {
   const handleExport = async () => {
     try {
       await exportRanges(state.ranges);
-      setMessage({ type: 'success', content: 'Ranges exported successfully!' });
+      showMessage('success', 'Ranges exported successfully!');
     } catch (error) {
       console.error('Export failed:', error);
-      setMessage({
-        type: 'error',
-        content: 'Could not export ranges. Please try again.',
-      });
+      showMessage('error', 'Could not export ranges. Please try again.');
     }
   };
 
@@ -124,48 +128,27 @@ export default function RangeIOControls() {
       event.target.value = '';
 
       // Show success message
-      setMessage({ type: 'success', content: 'Ranges imported successfully!' });
+      showMessage('success', 'Ranges imported successfully!');
     } catch (error) {
       console.error('Import failed:', error);
-      setMessage({ type: 'error', content: getReadableErrorMessage(error) });
+      showMessage('error', getReadableErrorMessage(error));
     } finally {
       setIsImporting(false);
     }
   };
 
-  const clearMessage = () => {
-    setMessage(null);
-  };
-
   return (
-    <div className="relative">
+    <>
       {/* Message display */}
-      {message && (
-        <div
-          className={`absolute bottom-full mb-2 right-0 w-72 px-4 py-2 rounded-lg text-sm
-            transition-opacity duration-300
-            ${
-              message.type === 'success'
-                ? 'bg-green-100 border border-green-400 text-green-700'
-                : 'bg-red-100 border border-red-400 text-red-700'
-            }`}
-        >
-          <div className="flex items-start justify-between gap-2">
-            <p>{message.content}</p>
-            <button
-              onClick={clearMessage}
-              className={`${
-                message.type === 'success'
-                  ? 'text-green-700 hover:text-green-800'
-                  : 'text-red-700 hover:text-red-800'
-              }`}
-              aria-label="Dismiss message"
-            >
-              <X size={16} />
-            </button>
-          </div>
-        </div>
-      )}
+      {message &&
+        createPortal(
+          <Message
+            type={message.type}
+            content={message.content}
+            onDismiss={() => setMessage(null)}
+          />,
+          document.getElementById('message-container')
+        )}
 
       {/* Controls */}
       <div className="grid grid-cols-2 gap-2 w-full">
@@ -201,6 +184,6 @@ export default function RangeIOControls() {
           aria-label="Import ranges from file"
         />
       </div>
-    </div>
+    </>
   );
 }

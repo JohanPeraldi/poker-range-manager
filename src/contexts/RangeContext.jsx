@@ -25,7 +25,17 @@ const ACTION_TYPES = {
   CLEAR_ERROR: 'CLEAR_ERROR',
 };
 
-// Initial state
+/**
+ * @typedef {Object} RangeState
+ * @property {string} selectedPosition - Currently selected position
+ * @property {Object} ranges - Range data for all positions
+ * @property {Object} colors - Color configurations for actions
+ * @property {string|null} error - Current error message if any
+ * @property {Object} history - Undo history for each position
+ * @property {Object} redoHistory - Redo history for each position
+ */
+
+// Initial state matches RangeState type
 const initialState = {
   selectedPosition: 'BTN',
   ranges: {
@@ -270,10 +280,32 @@ const rangeReducer = (state, action) => {
   }
 };
 
-// Context
+/**
+ * Context for managing poker hand ranges
+ * @type {React.Context<{
+ *   state: RangeState,
+ *   setSelectedPosition: (position: string) => void,
+ *   updateHandAction: (hand: string, action: string) => Promise<void>,
+ *   updateRangeForPosition: (position: string, range: Object) => Promise<void>,
+ *   resetRange: () => Promise<void>,
+ *   undo: () => Promise<void>,
+ *   redo: () => Promise<void>,
+ *   canUndo: () => boolean,
+ *   canRedo: () => boolean,
+ *   loadRange: (position: string) => Promise<void>,
+ *   clearError: () => void,
+ *   copyRange: (position: string) => Promise<boolean>,
+ *   pasteRange: (position: string) => Promise<boolean>,
+ *   canPaste: boolean
+ * }>}
+ */
 const RangeContext = createContext(null);
 
-// Custom hook for using the context
+/**
+ * Custom hook for using the range context
+ * @returns {Object} The range context value
+ * @throws {Error} When used outside of RangeProvider
+ */
 export const useRange = () => {
   const context = useContext(RangeContext);
   if (!context) {
