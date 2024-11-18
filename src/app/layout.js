@@ -1,4 +1,5 @@
 import { RangeProvider } from '@/contexts/RangeContext';
+
 import './globals.css';
 
 export const metadata = {

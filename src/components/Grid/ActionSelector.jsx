@@ -1,5 +1,3 @@
-'use client';
-
 import { ACTIONS, COLORS } from '@/constants/actions';
 import { getContrastText } from '@/utils/colorUtils';
 

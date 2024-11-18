@@ -1,9 +1,11 @@
 'use client';
 
-import React, { useRef, useState, useEffect } from 'react';
-import { Download, Upload, Loader2, X } from 'lucide-react';
-import { exportRanges, importRanges } from '@/utils/rangeUtils';
+import React, { useEffect, useRef, useState } from 'react';
+
+import { Download, Loader2, Upload, X } from 'lucide-react';
+
 import { useRange } from '@/contexts/RangeContext';
+import { exportRanges, importRanges } from '@/utils/rangeUtils';
 
 export default function RangeIOControls() {
   const fileInputRef = useRef(null);
@@ -166,14 +168,14 @@ export default function RangeIOControls() {
       )}
 
       {/* Controls */}
-      <div className="flex items-center gap-2">
+      <div className="grid grid-cols-2 gap-2 w-full">
         <button
           onClick={handleExport}
           className="flex items-center justify-center h-10 gap-2 px-4 py-2 text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
           aria-label="Export ranges"
         >
           <Download size={16} />
-          <span className="hidden sm:inline">Export</span>
+          <span>Export</span>
         </button>
 
         <button
@@ -187,9 +189,7 @@ export default function RangeIOControls() {
           ) : (
             <Upload size={16} />
           )}
-          <span className="hidden sm:inline">
-            {isImporting ? 'Importing...' : 'Import'}
-          </span>
+          <span>{isImporting ? 'Importing...' : 'Import'}</span>
         </button>
 
         <input

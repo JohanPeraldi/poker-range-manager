@@ -1,5 +1,3 @@
-'use client';
-
 const STORAGE_KEY = 'poker-ranges';
 
 /**

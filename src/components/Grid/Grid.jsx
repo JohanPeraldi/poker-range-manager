@@ -1,14 +1,16 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+
 import { ACTIONS } from '@/constants/actions';
 import { useRange } from '@/contexts/RangeContext';
 import { generateHands } from '@/utils/handUtils';
-import ActionSelector from './ActionSelector';
-import GridCell from './GridCell';
+
 import CopyPasteControls from '../CopyPasteControls/CopyPasteControls';
 import RangeIOControls from '../RangeIOControls/RangeIOControls';
 import ResetControls from '../ResetControls/ResetControls';
+import ActionSelector from './ActionSelector';
+import GridCell from './GridCell';
 
 export default function Grid() {
   const [grid] = useState(() => generateHands());
@@ -81,25 +83,12 @@ export default function Grid() {
   }
 
   return (
-    <div className="w-full max-w-3xl mx-auto">
-      {/* Toolbar with responsive layout */}
-      <div className="flex flex-wrap items-start gap-4 mb-4">
-        {/* Action Selector */}
-        <ActionSelector
-          selectedAction={selectedAction}
-          onActionSelect={setSelectedAction}
-        />
-
-        {/* Auto-spacing */}
-        <div className="flex-grow"></div>
-
-        {/* Reset and Import/Export Controls */}
-        <div className="flex items-start gap-4">
-          <ResetControls onClear={resetRange} />
-          <CopyPasteControls />
-          <RangeIOControls />
-        </div>
-      </div>
+    <div className="w-full h-full flex flex-col">
+      {/* Action Selector */}
+      <ActionSelector
+        selectedAction={selectedAction}
+        onActionSelect={setSelectedAction}
+      />
 
       {/* Grid content */}
       {isLoading ? (
@@ -107,21 +96,23 @@ export default function Grid() {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
         </div>
       ) : (
-        <div
-          className="border border-gray-300 select-none"
-          onMouseLeave={handleMouseLeave}
-        >
-          <div className="grid grid-cols-13">
-            {grid.flat().map((hand, index) => (
-              <GridCell
-                key={index}
-                hand={hand}
-                action={ranges[selectedPosition]?.[hand]}
-                onMouseDown={() => handleMouseDown(hand)}
-                onMouseEnter={() => handleMouseEnter(hand)}
-                onMouseUp={handleMouseUp}
-              />
-            ))}
+        <div className="flex-1 min-h-0">
+          <div
+            className="border border-gray-300 select-none h-full aspect-square"
+            onMouseLeave={handleMouseLeave}
+          >
+            <div className="grid grid-cols-13 h-full">
+              {grid.flat().map((hand, index) => (
+                <GridCell
+                  key={index}
+                  hand={hand}
+                  action={ranges[selectedPosition]?.[hand]}
+                  onMouseDown={() => handleMouseDown(hand)}
+                  onMouseEnter={() => handleMouseEnter(hand)}
+                  onMouseUp={handleMouseUp}
+                />
+              ))}
+            </div>
           </div>
         </div>
       )}

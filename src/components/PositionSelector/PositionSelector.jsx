@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+
 import { useRange } from '@/contexts/RangeContext';
 
 const POSITIONS = {

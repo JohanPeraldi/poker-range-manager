@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+
+import ControlPanel from '@/components/ControlPanel/ControlPanel';
 import Grid from '@/components/Grid/Grid';
 import PositionSelector from '@/components/PositionSelector/PositionSelector';
 import { saveRange } from '@/utils/storage';
@@ -45,12 +47,18 @@ export default function Home() {
         </div>
       )}
 
-      <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
-        <PositionSelector
-          selectedPosition={selectedPosition}
-          onPositionSelect={setSelectedPosition}
-        />
-        <div className="flex-1 min-w-0">
+      {/* Main content area */}
+      <div className="flex flex-col lg:grid lg:grid-cols-[200px_1fr_250px] gap-8">
+        {/* Left side: Position Selector */}
+        <div>
+          <PositionSelector
+            selectedPosition={selectedPosition}
+            onPositionSelect={setSelectedPosition}
+          />
+        </div>
+
+        {/* Center: Grid */}
+        <div className="max-w-[700px] w-full mx-auto">
           {/* Toggle testMode to true to simulate localStorage errors (remove before sending to production) */}
           <Grid
             key={`${selectedPosition}-${forceReload}`}
@@ -58,6 +66,11 @@ export default function Home() {
             testMode={false}
             onImport={handleImport}
           />
+        </div>
+
+        {/* Right/Bottom: Control Panel */}
+        <div className="lg:w-[250px]">
+          <ControlPanel />
         </div>
       </div>
     </main>

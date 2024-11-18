@@ -1,7 +1,5 @@
-'use client';
-
-import { GRID_COLORS, TEXT_COLORS } from '@/constants/colors';
 import { COLORS } from '@/constants/actions';
+import { GRID_COLORS, TEXT_COLORS } from '@/constants/colors';
 import { getContrastText } from '@/utils/colorUtils';
 
 export default function GridCell({

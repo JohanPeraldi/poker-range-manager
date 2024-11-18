@@ -1,5 +1,9 @@
+'use client';
+
 import React, { useState } from 'react';
-import { Copy, Clipboard } from 'lucide-react';
+
+import { Clipboard, Copy } from 'lucide-react';
+
 import { useRange } from '@/contexts/RangeContext';
 
 const CopyPasteControls = () => {
@@ -46,7 +50,7 @@ const CopyPasteControls = () => {
       )}
 
       {/* Controls */}
-      <div className="flex items-center gap-2">
+      <div className="grid grid-cols-2 gap-2 w-full">
         <button
           onClick={handleCopy}
           disabled={isLoading}
@@ -54,7 +58,7 @@ const CopyPasteControls = () => {
           aria-label="Copy range"
         >
           <Copy size={16} />
-          <span className="hidden sm:inline">Copy</span>
+          <span>Copy</span>
         </button>
 
         <button
@@ -64,7 +68,7 @@ const CopyPasteControls = () => {
           aria-label="Paste range"
         >
           <Clipboard size={16} />
-          <span className="hidden sm:inline">Paste</span>
+          <span>Paste</span>
         </button>
       </div>
     </div>

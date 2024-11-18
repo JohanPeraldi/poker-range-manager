@@ -2,13 +2,14 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
   useReducer,
-  useCallback,
   useState,
 } from 'react';
+
 import { ACTION_COLORS } from '@/constants/colors';
-import { saveRange as saveRangeToStorage, getRange } from '@/utils/storage';
+import { getRange, saveRange as saveRangeToStorage } from '@/utils/storage';
 
 // Action Types
 const ACTION_TYPES = {
