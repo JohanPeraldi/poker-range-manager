@@ -18,6 +18,7 @@ const ACTION_TYPES = {
   UPDATE_COLORS: 'UPDATE_COLORS',
   RESET_RANGE: 'RESET_RANGE',
   UNDO: 'UNDO',
+  REDO: 'REDO',
   LOAD_RANGE: 'LOAD_RANGE',
   SET_ERROR: 'SET_ERROR',
   CLEAR_ERROR: 'CLEAR_ERROR',
@@ -41,6 +42,7 @@ const initialState = {
   },
   error: null,
   history: {}, // For undo functionality
+  redoHistory: {}, // For redo functionality
 };
 
 // Reducer
@@ -57,12 +59,13 @@ const rangeReducer = (state, action) => {
       const { hand, action: handAction } = action.payload;
       const currentRange = state.ranges[state.selectedPosition] || {};
       const newRange = { ...currentRange };
+      const position = state.selectedPosition;
 
       // Store current state in history before updating
-      const positionHistory = state.history[state.selectedPosition] || [];
+      const positionHistory = state.history[position] || [];
       const newHistory = {
         ...state.history,
-        [state.selectedPosition]: [
+        [position]: [
           {
             ranges: { ...currentRange },
             type: 'HAND_UPDATE',
@@ -78,13 +81,18 @@ const rangeReducer = (state, action) => {
         newRange[hand] = handAction;
       }
 
+      // Clear redo history for this position when new action is performed
       return {
         ...state,
         ranges: {
           ...state.ranges,
-          [state.selectedPosition]: newRange,
+          [position]: newRange,
         },
         history: newHistory,
+        redoHistory: {
+          ...state.redoHistory,
+          [position]: [], // Clear redo history
+        },
         error: null,
       };
     }
@@ -157,12 +165,27 @@ const rangeReducer = (state, action) => {
     case ACTION_TYPES.UNDO: {
       const position = state.selectedPosition;
       const positionHistory = state.history[position] || [];
+      const positionRedoHistory = state.redoHistory[position] || [];
 
       if (positionHistory.length === 0) {
         return state;
       }
 
       const [lastState, ...remainingHistory] = positionHistory;
+      const currentRange = state.ranges[position];
+
+      // Add current state to redo history
+      const newRedoHistory = {
+        ...state.redoHistory,
+        [position]: [
+          {
+            ranges: { ...currentRange },
+            type: 'UNDO',
+            timestamp: Date.now(),
+          },
+          ...positionRedoHistory,
+        ].slice(0, 50),
+      };
 
       return {
         ...state,
@@ -173,6 +196,47 @@ const rangeReducer = (state, action) => {
         history: {
           ...state.history,
           [position]: remainingHistory,
+        },
+        redoHistory: newRedoHistory,
+        error: null,
+      };
+    }
+
+    case ACTION_TYPES.REDO: {
+      const position = state.selectedPosition;
+      const positionRedoHistory = state.redoHistory[position] || [];
+      const positionHistory = state.history[position] || [];
+
+      if (positionRedoHistory.length === 0) {
+        return state;
+      }
+
+      const [lastRedoState, ...remainingRedoHistory] = positionRedoHistory;
+      const currentRange = state.ranges[position];
+
+      // Add current state to undo history
+      const newHistory = {
+        ...state.history,
+        [position]: [
+          {
+            ranges: { ...currentRange },
+            type: 'REDO',
+            timestamp: Date.now(),
+          },
+          ...positionHistory,
+        ].slice(0, 50),
+      };
+
+      return {
+        ...state,
+        ranges: {
+          ...state.ranges,
+          [position]: lastRedoState.ranges,
+        },
+        history: newHistory,
+        redoHistory: {
+          ...state.redoHistory,
+          [position]: remainingRedoHistory,
         },
         error: null,
       };
@@ -305,6 +369,28 @@ export const RangeProvider = ({ children }) => {
     [state.history, state.selectedPosition]
   );
 
+  const canRedo = useCallback(
+    () => (state.redoHistory[state.selectedPosition]?.length ?? 0) > 0,
+    [state.redoHistory, state.selectedPosition]
+  );
+
+  const redo = useCallback(async () => {
+    try {
+      dispatch({ type: ACTION_TYPES.REDO });
+      const position = state.selectedPosition;
+      const redoHistory = state.redoHistory[position];
+
+      if (redoHistory?.length > 0) {
+        await saveRangeToStorage(position, redoHistory[0].ranges);
+      }
+    } catch (error) {
+      dispatch({
+        type: ACTION_TYPES.SET_ERROR,
+        payload: `Failed to redo: ${error.message}`,
+      });
+    }
+  }, [state.selectedPosition, state.redoHistory]);
+
   const loadRange = useCallback(async position => {
     try {
       const savedRange = await getRange(position);
@@ -365,6 +451,8 @@ export const RangeProvider = ({ children }) => {
     resetRange,
     undo,
     canUndo,
+    redo,
+    canRedo,
     loadRange,
     clearError,
     copyRange,
