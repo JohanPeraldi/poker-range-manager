@@ -73,6 +73,10 @@ export default function RangeIOControls() {
       const file = event.target.files?.[0];
       if (!file) return;
 
+      // Reset file input to ensure it triggers
+      // on repeated selections of the same file
+      event.target.value = '';
+
       // Validate file type
       if (!file.name.toLowerCase().endsWith('.json')) {
         throw new Error('Please select a valid JSON file');
