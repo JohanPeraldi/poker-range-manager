@@ -164,7 +164,7 @@ export default function RangeIOControls() {
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={isImporting}
-          className="flex items-center justify-center h-10 gap-2 px-4 py-2 text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center justify-center h-10 gap-2 px-4 py-2 text-gray-700 bg-gray-100 rounded hover:enabled:bg-gray-200 transition-colors disabled:text-gray-400 disabled:cursor-not-allowed"
           aria-label="Import ranges"
         >
           {isImporting ? (
