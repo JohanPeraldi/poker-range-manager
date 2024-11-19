@@ -4,24 +4,21 @@ import React, { useEffect, useState } from 'react';
 
 import { ACTIONS } from '@/constants/actions';
 import { useRange } from '@/contexts/RangeContext';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { generateHands } from '@/utils/handUtils';
 
-import CopyPasteControls from '../CopyPasteControls/CopyPasteControls';
-import RangeIOControls from '../RangeIOControls/RangeIOControls';
-import ResetControls from '../ResetControls/ResetControls';
 import ActionSelector from './ActionSelector';
 import GridCell from './GridCell';
 
 export default function Grid() {
+  const shortcuts = useKeyboardShortcuts();
   const [grid] = useState(() => generateHands());
   const [selectedAction, setSelectedAction] = useState(ACTIONS.RAISE);
   const [isSelecting, setIsSelecting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const {
-    state,
     updateHandAction,
-    resetRange,
     loadRange,
     state: { selectedPosition, ranges, error },
   } = useRange();
@@ -84,6 +81,7 @@ export default function Grid() {
 
   return (
     <div className="w-full h-full flex flex-col">
+      {shortcuts}
       {/* Action Selector */}
       <ActionSelector
         selectedAction={selectedAction}

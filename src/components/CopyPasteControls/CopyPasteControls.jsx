@@ -36,11 +36,7 @@ export default function CopyPasteControls() {
   };
 
   const handlePaste = async () => {
-    const success = await pasteRange(selectedPosition);
-    showMessage(
-      success ? 'success' : 'error',
-      success ? 'Range pasted!' : 'Failed to paste range'
-    );
+    await pasteRange(selectedPosition);
   };
 
   return (
