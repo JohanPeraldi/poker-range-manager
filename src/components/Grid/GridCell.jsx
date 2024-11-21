@@ -18,10 +18,11 @@ export default function GridCell({
       ? GRID_COLORS.POCKET_PAIR
       : GRID_COLORS.OFFSUIT;
   const textClass = action ? getContrastText(bgClass) : TEXT_COLORS.DARK;
+  const textSizeClass = 'text-[8px] xxs:text-[9px] xs:text-[10px] sm:text-sm'; // Responsive text sizing
 
   return (
     <div
-      className={`${baseClass} ${bgClass} ${textClass}`}
+      className={`${baseClass} ${bgClass} ${textClass} ${textSizeClass}`}
       onMouseDown={onMouseDown}
       onMouseEnter={onMouseEnter}
       onMouseUp={onMouseUp}
