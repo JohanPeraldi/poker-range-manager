@@ -1,29 +1,34 @@
 # Poker Range Manager
 
+[![Live Demo](https://img.shields.io/badge/demo-live-green?style=for-the-badge)](https://poker-range-manager.techgiant.tech)
+[![Vercel](https://therealsujitk-vercel-badge.vercel.app/?app=poker-range-manager)](https://poker-range-manager.techgiant.tech)
+![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)
+[![React](https://img.shields.io/badge/React-19.0.0--rc-61DAFB?logo=react&logoColor=white)](https://reactjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15.0.1-black?logo=next.js&logoColor=white)](https://nextjs.org/)
+
 A Next.js-based web application for No Limit Hold'em poker players to create and manage hand ranges. The MVP focuses on RFI (Raise First In) situations from all positions in a 6-max format game, including Big Blind defense ranges.
 
-## Features
+## Preview
 
-### MVP Features
+<div align="center">
+  <img src="screenshots/btn-range-desktop.png" alt="Button raise first in range" width="1100" />
+  <br/><br/>
+  <img src="screenshots/bb-range-desktop.png" alt="Big Blind defense range" width="1100" />
+  <br/><br/>
+  <img src="screenshots/bb-range-mobile.png" alt="Mobile responsive view" width="375" />
+</div>
+
+## Current Features
 
 - 📊 Interactive hand range grid for RFI situations
-- 🎨 Color-coded actions:
-  - Raise (red)
-  - Call (light blue - for BB defense)
-  - Fold (grey)
-- 🎯 Position-based ranges:
-  - Button (BTN)
-  - Cut-off (CO)
-  - Hijack (HJ)
-  - Lojack (LJ)
-  - Small Blind (SB)
-  - Big Blind (BB)
+- 🎨 Color-coded actions (Raise/Call/Fold)
+- 🎯 Position-based ranges (BTN/CO/HJ/LJ/SB/BB)
 - 🔄 Undo/Redo functionality
-- 📤 Import/Export functionality
-- 💾 Local storage for saving ranges
-- 🖥️ Desktop-first responsive design
+- 📤 Import/Export ranges
+- 💾 Local storage persistence
+- ⌨️ Keyboard shortcuts
 
-### Future Features (Post-MVP)
+## Future Features
 
 - 📖 Displaying several ranges simultaneaously according to range type (all RFI ranges, etc.)
 - 🎲 More complex range situations (facing RFI, 3-bet, etc.)
@@ -39,12 +44,19 @@ A Next.js-based web application for No Limit Hold'em poker players to create and
 
 ## Tech Stack
 
-- Frontend:
-  - Next.js 15
-  - React 19
-  - Context API for state management
-  - Tailwind CSS
-  - Local Storage for data persistence
+- Next.js 15
+- React 19
+- Tailwind CSS
+- Context API
+
+## Quick Start
+
+```bash
+git clone https://github.com/JohanPeraldi/poker-range-manager.git
+cd poker-range-manager
+npm install
+npm run dev
+```
 
 ## Project Structure
 
@@ -58,64 +70,25 @@ src/
 │
 ├── components/
 │   ├── ActionSelector/
-│   │   └── ActionSelector.jsx
 │   ├── ControlPanel/
-│   │   └── ControlPanel.jsx
 │   ├── CopyPasteControls/
-│   │   └── CopyPasteControls.jsx
 │   ├── Grid/
-│   │   └── Grid.jsx
 │   ├── GridCell/
-│   │   └── GridCell.jsx
 │   ├── Message/
-│   │   └── Message.jsx
 │   ├── PositionSelector/
-│   │   └── PositionSelector.jsx
 │   ├── RangeControls/
-│   │   └── RangeControls.jsx
 │   └── ResetControls/
-│       └── ResetControls.jsx
 ├── constants/
-│   ├── actions.js
-│   ├── colors.js
-│   └── positions.js
 ├── contexts/
-│   └── RangeContext.jsx
 ├── hooks/
-│   └── useKeyboardShortcuts.js
 └── utils/
-    ├── colorUtils.js
-    ├── handUtils.js
-    ├── rangeUtils.js
-    └── storage.js
-```
-
-## Installation
-
-1. Clone the repository:
-
-```bash
-git clone https://github.com/JohanPeraldi/poker-range-manager.git
-```
-
-2. Install dependencies:
-
-```bash
-cd poker-range-manager
-npm install
-```
-
-3. Start the development server:
-
-```bash
-npm run dev
 ```
 
 ## Development Guidelines
 
 ### Commit Message Guidelines
 
-We follow the Conventional Commits specification for commit messages. Each commit message should be structured as follows:
+We follow the Conventional Commits specification:
 
 ```
 <type>[optional scope]: <description>
@@ -127,13 +100,13 @@ We follow the Conventional Commits specification for commit messages. Each commi
 
 #### Types
 
-- `feat`: A new feature
-- `fix`: A bug fix
-- `docs`: Documentation only changes
-- `style`: Changes that don't affect code meaning (white-space, formatting, etc)
-- `refactor`: Code changes that neither fix bugs nor add features
-- `test`: Adding missing tests or correcting existing tests
-- `chore`: Changes to build process or auxiliary tools
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation changes
+- `style`: Code style changes
+- `refactor`: Code refactoring
+- `test`: Adding/fixing tests
+- `chore`: Maintenance tasks
 - `perf`: Performance improvements
 
 #### Examples:
@@ -180,8 +153,6 @@ fix/local-storage
 ```
 
 ## Contributing
-
-This project is currently in development. When contributing:
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
