@@ -1,7 +1,7 @@
 import React from 'react';
 
 import CopyPasteControls from '../CopyPasteControls/CopyPasteControls';
-import RangeIOControls from '../RangeIOControls/RangeIOControls';
+import RangeControls from '../RangeControls/RangeControls';
 import ResetControls from '../ResetControls/ResetControls';
 
 export default function ControlPanel() {
@@ -23,7 +23,7 @@ export default function ControlPanel() {
         <h2 className="text-lg font-semibold mb-3">Range Management</h2>
         <div className="flex flex-col gap-2">
           <CopyPasteControls />
-          <RangeIOControls />
+          <RangeControls />
         </div>
       </div>
     </div>

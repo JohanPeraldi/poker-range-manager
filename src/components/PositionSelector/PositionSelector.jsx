@@ -2,16 +2,8 @@
 
 import React from 'react';
 
+import { POSITIONS } from '@/constants/positions';
 import { useRange } from '@/contexts/RangeContext';
-
-const POSITIONS = {
-  BTN: 'Button',
-  CO: 'Cut-off',
-  HJ: 'Hijack',
-  LJ: 'Lojack',
-  SB: 'Small Blind',
-  BB: 'Big Blind',
-};
 
 export default function PositionSelector() {
   const { state, setSelectedPosition } = useRange();

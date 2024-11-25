@@ -7,7 +7,7 @@ A Next.js-based web application for No Limit Hold'em poker players to create and
 ### MVP Features
 
 - 📊 Interactive hand range grid for RFI situations
-- 🎨 Color-coded (customizable) actions:
+- 🎨 Color-coded actions:
   - Raise (red)
   - Call (light blue - for BB defense)
   - Fold (grey)
@@ -18,18 +18,24 @@ A Next.js-based web application for No Limit Hold'em poker players to create and
   - Lojack (LJ)
   - Small Blind (SB)
   - Big Blind (BB)
+- 🔄 Undo/Redo functionality
+- 📤 Import/Export functionality
 - 💾 Local storage for saving ranges
 - 🖥️ Desktop-first responsive design
 
 ### Future Features (Post-MVP)
 
+- 📖 Displaying several ranges simultaneaously according to range type (all RFI ranges, etc.)
+- 🎲 More complex range situations (facing RFI, 3-bet, etc.)
+- 🤹‍♀️ Split ranges (several actions possible for one single hand)
+- 📄 Copy pasting ranges in other file formats
+- 🔒 Locking ranges to avoid accidental modification
+- 🎨 Color theme custumisation
 - 🔐 User authentication
-- ☁️ Cloud storage
-- 📤 Import/Export functionality
+- 🌧️ Cloud storage
 - 👥 Range sharing capabilities
 - 📝 Notes and annotations
 - 📊 Advanced statistics
-- 🔄 Undo/Redo functionality
 
 ## Tech Stack
 
@@ -45,29 +51,43 @@ A Next.js-based web application for No Limit Hold'em poker players to create and
 ```
 src/
 ├── app/
-│   ├── layout.jsx
-│   ├── page.jsx
-│   └── globals.css
+│   ├── favicon.ico
+│   ├── globals.css
+│   ├── layout.js
+│   └── page.js
+│
 ├── components/
+│   ├── ActionSelector/
+│   │   └── ActionSelector.jsx
+│   ├── ControlPanel/
+│   │   └── ControlPanel.jsx
+│   ├── CopyPasteControls/
+│   │   └── CopyPasteControls.jsx
 │   ├── Grid/
-│   │   ├── Grid.jsx
-│   │   ├── GridCell.jsx
-│   │   └── gridUtils.js
+│   │   └── Grid.jsx
+│   ├── GridCell/
+│   │   └── GridCell.jsx
+│   ├── Message/
+│   │   └── Message.jsx
 │   ├── PositionSelector/
 │   │   └── PositionSelector.jsx
-│   ├── ColorPicker/
-│   │   └── ColorPicker.jsx
-│   └── RangeControls/
-│       └── RangeControls.jsx
+│   ├── RangeControls/
+│   │   └── RangeControls.jsx
+│   └── ResetControls/
+│       └── ResetControls.jsx
+├── constants/
+│   ├── actions.js
+│   ├── colors.js
+│   └── positions.js
 ├── contexts/
 │   └── RangeContext.jsx
-├── constants/
-│   ├── positions.js
-│   ├── actions.js
-│   └── colors.js
+├── hooks/
+│   └── useKeyboardShortcuts.js
 └── utils/
-    ├── storage.js
-    └── handUtils.js
+    ├── colorUtils.js
+    ├── handUtils.js
+    ├── rangeUtils.js
+    └── storage.js
 ```
 
 ## Installation

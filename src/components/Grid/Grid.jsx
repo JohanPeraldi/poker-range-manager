@@ -7,8 +7,8 @@ import { useRange } from '@/contexts/RangeContext';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { generateHands } from '@/utils/handUtils';
 
-import ActionSelector from './ActionSelector';
-import GridCell from './GridCell';
+import ActionSelector from '../ActionSelector/ActionSelector';
+import GridCell from '../GridCell/GridCell';
 
 export default function Grid() {
   const shortcuts = useKeyboardShortcuts();

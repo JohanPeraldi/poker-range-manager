@@ -59,11 +59,9 @@ export default function Home() {
 
         {/* Center: Grid */}
         <div className="max-w-[700px] w-full mx-auto">
-          {/* Toggle testMode to true to simulate localStorage errors (remove before sending to production) */}
           <Grid
             key={`${selectedPosition}-${forceReload}`}
             position={selectedPosition}
-            testMode={false}
             onImport={handleImport}
           />
         </div>
