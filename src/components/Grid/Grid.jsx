@@ -7,7 +7,7 @@ import { useRange } from '@/contexts/RangeContext';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { generateHands } from '@/utils/handUtils';
 
-import ActionSelector from '../ActionSelector/ActionSelector';
+import ColorPicker from '../ColorPicker/ColorPicker';
 import GridCell from '../GridCell/GridCell';
 
 export default function Grid() {
@@ -20,7 +20,7 @@ export default function Grid() {
   const {
     updateHandAction,
     loadRange,
-    state: { selectedPosition, ranges, error },
+    state: { selectedPosition, ranges, colors, error },
   } = useRange();
 
   // Load saved range when component mounts or position changes
@@ -82,8 +82,8 @@ export default function Grid() {
   return (
     <div className="w-full h-full flex flex-col">
       {shortcuts}
-      {/* Action Selector */}
-      <ActionSelector
+      {/* Color Picker - Replaces the old ActionSelector */}
+      <ColorPicker
         selectedAction={selectedAction}
         onActionSelect={setSelectedAction}
       />
@@ -105,6 +105,7 @@ export default function Grid() {
                   key={index}
                   hand={hand}
                   action={ranges[selectedPosition]?.[hand]}
+                  customColor={colors?.[ranges[selectedPosition]?.[hand]]}
                   onMouseDown={() => handleMouseDown(hand)}
                   onMouseEnter={() => handleMouseEnter(hand)}
                   onMouseUp={handleMouseUp}
