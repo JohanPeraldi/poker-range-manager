@@ -1,7 +1,7 @@
 # Poker Range Manager
 
-[![Live Demo](https://img.shields.io/badge/demo-live-green?style=for-the-badge)](https://poker-range-manager.techgiant.tech)
-[![Vercel](https://therealsujitk-vercel-badge.vercel.app/?app=poker-range-manager)](https://poker-range-manager.techgiant.tech)
+[![Live Demo](https://img.shields.io/badge/demo-live-green?style=for-the-badge)](https://www.rangerover.org.uk/)
+[![Vercel](https://therealsujitk-vercel-badge.vercel.app/?app=poker-range-manager)](https://www.rangerover.org.uk/)
 ![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)
 [![React](https://img.shields.io/badge/React-19.0.0--rc-61DAFB?logo=react&logoColor=white)](https://reactjs.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-15.0.1-black?logo=next.js&logoColor=white)](https://nextjs.org/)
@@ -10,23 +10,30 @@ A Next.js-based web application for No Limit Hold'em poker players to create and
 
 ## Preview
 
-<div align="center">
-  <img src="screenshots/btn-range-desktop.png" alt="Button raise first in range" width="1100" />
-  <br/><br/>
-  <img src="screenshots/bb-range-desktop.png" alt="Big Blind defense range" width="1100" />
-  <br/><br/>
-  <img src="screenshots/bb-range-mobile.png" alt="Mobile responsive view" width="375" />
-</div>
+<!-- Preview Images -->
+
+![Button raise first in range](screenshots/poker-range-manager-app-desktop-view.png)
+![App showing color customization options](screenshots/poker-range-manager-app-color-options-desktop-view.png)
+![Big Blind defense range](screenshots/poker-range-manager-app-bb-range-desktop-view.png)
+![Mobile responsive view](screenshots/poker-range-manager-app-mobile-view.png)
 
 ## Current Features
 
 - 📊 Interactive hand range grid for RFI situations
-- 🎨 Color-coded actions (Raise/Call/Fold)
+- 🎨 Customizable action colors with:
+  - Color picker for full customization
+  - 6 preset colors per action for quick selection
+  - Hex color input for precise control
+  - Undo/Redo functionality for color changes
+  - Persistent color preferences saved locally
+  - Automatic text contrast adjustment for accessibility
 - 🎯 Position-based ranges (BTN/CO/HJ/LJ/SB/BB)
 - 🔄 Undo/Redo functionality
+- 📋 Copy/Paste ranges between positions
 - 📤 Import/Export ranges
-- 💾 Local storage persistence
-- ⌨️ Keyboard shortcuts
+- 💾 Local storage persistence for saving ranges and color preferences
+- ⌨️ Keyboard shortcuts (Ctrl/Cmd + C/V/Z)
+- 🖥️ Desktop-first responsive design with mobile support
 
 ## Future Features
 
@@ -60,7 +67,7 @@ npm run dev
 
 ## Project Structure
 
-```
+```plaintext
 src/
 ├── app/
 │   ├── favicon.ico
@@ -70,18 +77,38 @@ src/
 │
 ├── components/
 │   ├── ActionSelector/
+│   │   └── ActionSelector.jsx
+│   ├── ColorPicker/
+│   │   └── ColorPicker.jsx
 │   ├── ControlPanel/
+│   │   └── ControlPanel.jsx
 │   ├── CopyPasteControls/
+│   │   └── CopyPasteControls.jsx
 │   ├── Grid/
+│   │   └── Grid.jsx
 │   ├── GridCell/
+│   │   └── GridCell.jsx
 │   ├── Message/
+│   │   └── Message.jsx
 │   ├── PositionSelector/
+│   │   └── PositionSelector.jsx
 │   ├── RangeControls/
+│   │   └── RangeControls.jsx
 │   └── ResetControls/
+│       └── ResetControls.jsx
 ├── constants/
+│   ├── actions.js
+│   ├── colors.js
+│   └── positions.js
 ├── contexts/
+│   └── RangeContext.jsx
 ├── hooks/
-└── utils/
+│   └── useKeyboardShortcuts.js
+├── utils/
+├── colorUtils.js
+├── handUtils.js
+├── rangeUtils.js
+└── storage.js
 ```
 
 ## Development Guidelines
@@ -90,7 +117,7 @@ src/
 
 We follow the Conventional Commits specification:
 
-```
+```plaintext
 <type>[optional scope]: <description>
 
 [optional body]
@@ -109,7 +136,7 @@ We follow the Conventional Commits specification:
 - `chore`: Maintenance tasks
 - `perf`: Performance improvements
 
-#### Examples:
+#### Examples
 
 ```bash
 # Adding new features
