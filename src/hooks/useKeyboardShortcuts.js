@@ -13,7 +13,9 @@ export const useKeyboardShortcuts = () => {
     canUndo,
     canRedo,
     canPaste,
-    state: { selectedPosition },
+    toggleEditMode,
+    setEditMode,
+    state: { selectedPosition, isEditMode },
   } = useRange();
 
   const [message, setMessage] = useState(null);
@@ -38,13 +40,53 @@ export const useKeyboardShortcuts = () => {
         return;
       }
 
+      // Handle non-modifier key shortcuts first
+      if (
+        !event.ctrlKey &&
+        !event.metaKey &&
+        !event.altKey &&
+        !event.shiftKey
+      ) {
+        switch (event.key.toLowerCase()) {
+          case 'e': // Toggle edit mode
+            event.preventDefault();
+            toggleEditMode();
+            setMessage({
+              type: 'success',
+              content: isEditMode
+                ? 'Switched to View Mode'
+                : 'Switched to Edit Mode',
+            });
+            return;
+
+          case 'escape': // Exit edit mode
+            if (isEditMode) {
+              event.preventDefault();
+              setEditMode(false);
+              setMessage({
+                type: 'success',
+                content: 'Switched to View Mode',
+              });
+            }
+            return;
+
+          default:
+            break;
+        }
+      }
+
+      // Edit mode only shortcuts
+      if (!isEditMode) {
+        return; // Block all other shortcuts in View Mode
+      }
+
       // Get ctrl/cmd key based on platform
       const controlPressed = event.metaKey || event.ctrlKey;
 
       if (!controlPressed) return;
 
       switch (event.key.toLowerCase()) {
-        case 'c': // Copy
+        case 'c': // Copy (Edit mode only)
           event.preventDefault();
           const copySuccess = await copyRange(selectedPosition);
           setMessage({
@@ -53,14 +95,14 @@ export const useKeyboardShortcuts = () => {
           });
           break;
 
-        case 'v': // Paste
+        case 'v': // Paste (Edit mode only)
           if (canPaste) {
             event.preventDefault();
             await pasteRange(selectedPosition);
           }
           break;
 
-        case 'z': // Undo/Redo
+        case 'z': // Undo/Redo (Edit mode only)
           event.preventDefault();
           if (event.shiftKey && canRedo()) {
             await redo();
@@ -84,7 +126,10 @@ export const useKeyboardShortcuts = () => {
     canUndo,
     canRedo,
     canPaste,
+    toggleEditMode,
+    setEditMode,
     selectedPosition,
+    isEditMode,
   ]);
 
   return (

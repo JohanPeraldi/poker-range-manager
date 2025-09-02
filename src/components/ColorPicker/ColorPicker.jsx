@@ -12,7 +12,7 @@ import { getContrastText, hexToRGB } from '@/utils/colorUtils';
 const DEFAULT_COLORS = {
   RAISE: '#991b1b', // bg-red-800
   CALL: '#bfdbfe', // bg-blue-200
-  FOLD: '#d1d5db', // bg-gray-300
+  FOLD: '#f3f4f6', // Lightest gray (new default)
 };
 
 // Color presets for quick selection - arranged by tones
@@ -34,16 +34,20 @@ const COLOR_PRESETS = {
     '#10b981', // Green
   ],
   FOLD: [
-    '#d1d5db', // Default gray
-    '#f3f4f6', // Lightest gray
+    '#f3f4f6', // Lightest gray (new default)
     '#e5e7eb', // Light gray
+    '#d1d5db', // Old default gray (moved to 3rd position)
     '#9ca3af', // Medium gray
     '#6b7280', // Darker gray
     '#374151', // Darkest gray
   ],
 };
 
-export default function ColorPicker({ selectedAction, onActionSelect }) {
+export default function ColorPicker({
+  selectedAction,
+  onActionSelect,
+  isEditMode,
+}) {
   const { state, updateColors } = useRange();
   // Always start with default colors for SSR consistency
   const [customColors, setCustomColors] = useState(DEFAULT_COLORS);
@@ -59,12 +63,13 @@ export default function ColorPicker({ selectedAction, onActionSelect }) {
         try {
           const parsedColors = JSON.parse(saved);
           setCustomColors(parsedColors);
+          updateColors(parsedColors); // Update context immediately
         } catch (error) {
           console.error('Failed to parse saved colors:', error);
         }
       }
     }
-  }, []); // Run once on mount
+  }, [updateColors]); // Run once on mount
 
   // Save custom colors to localStorage whenever they change
   useEffect(() => {
@@ -74,7 +79,7 @@ export default function ColorPicker({ selectedAction, onActionSelect }) {
     }
     // Update the context with new colors
     updateColors(customColors);
-  }, [customColors, updateColors]);
+  }, [customColors, updateColors]); // Added updateColors dependency
 
   // Add to history when colors change (but not from undo/redo)
   const addToHistory = (colors, fromUndoRedo = false) => {
@@ -102,6 +107,7 @@ export default function ColorPicker({ selectedAction, onActionSelect }) {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('poker-custom-colors');
     }
+    updateColors(DEFAULT_COLORS);
   };
 
   const undo = () => {
@@ -135,8 +141,38 @@ export default function ColorPicker({ selectedAction, onActionSelect }) {
     return getContrastText(bgColor);
   };
 
+  // VIEW MODE: Render as non-interactive legend
+  if (!isEditMode) {
+    return (
+      <div className="color-legend-container mb-4">
+        <div className="flex gap-2">
+          {Object.values(ACTIONS)
+            .filter(action => action !== null)
+            .map(action => {
+              const bgColor = customColors[action];
+              const textColor = getTextColor(bgColor);
+
+              return (
+                <div
+                  key={action}
+                  className={`flex items-center justify-center h-10 px-4 py-2 rounded-lg ${textColor} shadow-sm border border-gray-200`}
+                  style={hexToTailwindClass(bgColor)}
+                  title={`${action} - Legend`}
+                >
+                  <span className="text-sm font-medium">
+                    {action.charAt(0) + action.slice(1).toLowerCase()}
+                  </span>
+                </div>
+              );
+            })}
+        </div>
+      </div>
+    );
+  }
+
+  // EDIT MODE: Render full interactive component
   return (
-    <div className="color-picker-container">
+    <div className="color-picker-container relative w-full">
       {/* Action Selector Buttons */}
       <div className="flex items-center gap-2 mb-4">
         <div className="flex gap-2 flex-1">
@@ -183,7 +219,7 @@ export default function ColorPicker({ selectedAction, onActionSelect }) {
 
       {/* Color Customization Panel */}
       {showColorPanel && (
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4 shadow-sm">
+        <div className="absolute left-0 right-0 top-full mt-2 bg-gray-50 border border-gray-200 rounded-lg p-4 shadow-lg z-10">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-gray-700">
               Customize Action Colors

@@ -8,6 +8,7 @@ import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { generateHands } from '@/utils/handUtils';
 
 import ColorPicker from '../ColorPicker/ColorPicker';
+import EditModeToggle from '../EditModeToggle/EditModeToggle';
 import GridCell from '../GridCell/GridCell';
 
 export default function Grid() {
@@ -20,7 +21,7 @@ export default function Grid() {
   const {
     updateHandAction,
     loadRange,
-    state: { selectedPosition, ranges, colors, error },
+    state: { selectedPosition, ranges, colors, error, isEditMode },
   } = useRange();
 
   // Load saved range when component mounts or position changes
@@ -37,8 +38,10 @@ export default function Grid() {
     loadSavedRange();
   }, [selectedPosition, loadRange]);
 
-  // Handle mouse down to start selection
+  // Handle mouse down to start selection - only in edit mode
   const handleMouseDown = hand => {
+    if (!isEditMode) return; // Ignore clicks in View Mode
+
     setIsSelecting(true);
     const currentAction = ranges[selectedPosition]?.[hand];
 
@@ -50,9 +53,9 @@ export default function Grid() {
     }
   };
 
-  // Handle mouse enter while selecting
+  // Handle mouse enter while selecting - only in edit mode
   const handleMouseEnter = hand => {
-    if (!isSelecting) return;
+    if (!isSelecting || !isEditMode) return; // Ignore drag in View Mode
     updateHandAction(hand, selectedAction);
   };
 
@@ -82,11 +85,24 @@ export default function Grid() {
   return (
     <div className="w-full h-full flex flex-col">
       {shortcuts}
-      {/* Color Picker - Replaces the old ActionSelector */}
-      <ColorPicker
-        selectedAction={selectedAction}
-        onActionSelect={setSelectedAction}
-      />
+
+      {/* Action bar with ColorPicker and Edit Mode Toggle */}
+      <div className="w-full mb-4">
+        <div className="flex items-start justify-between">
+          <div className="flex-1 min-w-0">
+            {/* Color Picker - only show in edit mode, or transform to legend in view mode */}
+            <ColorPicker
+              selectedAction={selectedAction}
+              onActionSelect={setSelectedAction}
+              isEditMode={isEditMode}
+            />
+          </div>
+          <div className="flex items-center gap-2 ml-4 flex-shrink-0">
+            {/* Edit Mode Toggle - positioned top-right */}
+            <EditModeToggle />
+          </div>
+        </div>
+      </div>
 
       {/* Grid content */}
       {isLoading ? (
@@ -94,7 +110,7 @@ export default function Grid() {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
         </div>
       ) : (
-        <div className="flex-1 min-h-0">
+        <div className="flex-1 min-h-0 relative">
           <div
             className="border border-gray-300 select-none h-full aspect-square"
             onMouseLeave={handleMouseLeave}
@@ -109,6 +125,7 @@ export default function Grid() {
                   onMouseDown={() => handleMouseDown(hand)}
                   onMouseEnter={() => handleMouseEnter(hand)}
                   onMouseUp={handleMouseUp}
+                  isEditable={isEditMode} // Pass edit mode to GridCell
                 />
               ))}
             </div>

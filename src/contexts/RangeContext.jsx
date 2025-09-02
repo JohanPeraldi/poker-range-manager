@@ -23,6 +23,9 @@ const ACTION_TYPES = {
   LOAD_RANGE: 'LOAD_RANGE',
   SET_ERROR: 'SET_ERROR',
   CLEAR_ERROR: 'CLEAR_ERROR',
+  // New action types for edit mode
+  TOGGLE_EDIT_MODE: 'TOGGLE_EDIT_MODE',
+  SET_EDIT_MODE: 'SET_EDIT_MODE',
 };
 
 /**
@@ -33,6 +36,7 @@ const ACTION_TYPES = {
  * @property {string|null} error - Current error message if any
  * @property {Object} history - Undo history for each position
  * @property {Object} redoHistory - Redo history for each position
+ * @property {boolean} isEditMode - Whether ranges can be edited
  */
 
 // Initial state matches RangeState type
@@ -47,13 +51,14 @@ const initialState = {
     BB: {},
   },
   colors: {
-    RAISE: ACTION_COLORS.RAISE,
-    CALL: ACTION_COLORS.CALL,
-    FOLD: ACTION_COLORS.FOLD,
+    RAISE: '#991b1b', // Ensure we use hex values directly
+    CALL: '#bfdbfe', // Ensure we use hex values directly
+    FOLD: '#f3f4f6', // Use lightest gray as default for fold
   },
   error: null,
   history: {}, // For undo functionality
   redoHistory: {}, // For redo functionality
+  isEditMode: false, // Default to View Mode for safety
 };
 
 // Reducer
@@ -67,6 +72,12 @@ const rangeReducer = (state, action) => {
       };
 
     case ACTION_TYPES.UPDATE_HAND: {
+      // Safety check: only allow updates in edit mode
+      if (!state.isEditMode) {
+        console.warn('Attempted to update hand in View Mode - ignoring');
+        return state;
+      }
+
       const { hand, action: handAction } = action.payload;
       const currentRange = state.ranges[state.selectedPosition] || {};
       const newRange = { ...currentRange };
@@ -109,6 +120,12 @@ const rangeReducer = (state, action) => {
     }
 
     case ACTION_TYPES.UPDATE_RANGE: {
+      // Safety check: only allow updates in edit mode
+      if (!state.isEditMode) {
+        console.warn('Attempted to update range in View Mode - ignoring');
+        return state;
+      }
+
       const { position, range } = action.payload;
       const currentRange = state.ranges[position] || {};
       const positionHistory = state.history[position] || [];
@@ -147,6 +164,12 @@ const rangeReducer = (state, action) => {
       };
 
     case ACTION_TYPES.RESET_RANGE: {
+      // Safety check: only allow reset in edit mode
+      if (!state.isEditMode) {
+        console.warn('Attempted to reset range in View Mode - ignoring');
+        return state;
+      }
+
       const currentRange = state.ranges[state.selectedPosition] || {};
       const positionHistory = state.history[state.selectedPosition] || [];
 
@@ -174,6 +197,12 @@ const rangeReducer = (state, action) => {
     }
 
     case ACTION_TYPES.UNDO: {
+      // Safety check: only allow undo in edit mode
+      if (!state.isEditMode) {
+        console.warn('Attempted to undo in View Mode - ignoring');
+        return state;
+      }
+
       const position = state.selectedPosition;
       const positionHistory = state.history[position] || [];
       const positionRedoHistory = state.redoHistory[position] || [];
@@ -214,6 +243,12 @@ const rangeReducer = (state, action) => {
     }
 
     case ACTION_TYPES.REDO: {
+      // Safety check: only allow redo in edit mode
+      if (!state.isEditMode) {
+        console.warn('Attempted to redo in View Mode - ignoring');
+        return state;
+      }
+
       const position = state.selectedPosition;
       const positionRedoHistory = state.redoHistory[position] || [];
       const positionHistory = state.history[position] || [];
@@ -275,6 +310,21 @@ const rangeReducer = (state, action) => {
         error: null,
       };
 
+    // New cases for edit mode
+    case ACTION_TYPES.TOGGLE_EDIT_MODE:
+      return {
+        ...state,
+        isEditMode: !state.isEditMode,
+        error: null,
+      };
+
+    case ACTION_TYPES.SET_EDIT_MODE:
+      return {
+        ...state,
+        isEditMode: action.payload,
+        error: null,
+      };
+
     default:
       return state;
   }
@@ -296,7 +346,9 @@ const rangeReducer = (state, action) => {
  *   clearError: () => void,
  *   copyRange: (position: string) => Promise<boolean>,
  *   pasteRange: (position: string) => Promise<boolean>,
- *   canPaste: boolean
+ *   canPaste: boolean,
+ *   toggleEditMode: () => void,
+ *   setEditMode: (isEdit: boolean) => void
  * }>}
  */
 const RangeContext = createContext(null);
@@ -332,11 +384,14 @@ export const RangeProvider = ({ children }) => {
           payload: { hand, action },
         });
 
-        // Persist to storage
-        await saveRangeToStorage(state.selectedPosition, {
-          ...state.ranges[state.selectedPosition],
-          [hand]: action,
-        });
+        // Only persist to storage in edit mode
+        if (state.isEditMode) {
+          // Persist to storage
+          await saveRangeToStorage(state.selectedPosition, {
+            ...state.ranges[state.selectedPosition],
+            [hand]: action,
+          });
+        }
       } catch (error) {
         dispatch({
           type: ACTION_TYPES.SET_ERROR,
@@ -344,25 +399,31 @@ export const RangeProvider = ({ children }) => {
         });
       }
     },
-    [state.selectedPosition, state.ranges]
+    [state.selectedPosition, state.ranges, state.isEditMode]
   );
 
-  const updateRangeForPosition = useCallback(async (position, range) => {
-    try {
-      dispatch({
-        type: ACTION_TYPES.UPDATE_RANGE,
-        payload: { position, range },
-      });
+  const updateRangeForPosition = useCallback(
+    async (position, range) => {
+      try {
+        dispatch({
+          type: ACTION_TYPES.UPDATE_RANGE,
+          payload: { position, range },
+        });
 
-      // Persist to storage
-      await saveRangeToStorage(position, range);
-    } catch (error) {
-      dispatch({
-        type: ACTION_TYPES.SET_ERROR,
-        payload: `Failed to update range: ${error.message}`,
-      });
-    }
-  }, []);
+        // Only persist to storage in edit mode
+        if (state.isEditMode) {
+          // Persist to storage
+          await saveRangeToStorage(position, range);
+        }
+      } catch (error) {
+        dispatch({
+          type: ACTION_TYPES.SET_ERROR,
+          payload: `Failed to update range: ${error.message}`,
+        });
+      }
+    },
+    [state.isEditMode]
+  );
 
   const updateColors = useCallback(newColors => {
     dispatch({ type: ACTION_TYPES.UPDATE_COLORS, payload: newColors });
@@ -371,14 +432,16 @@ export const RangeProvider = ({ children }) => {
   const resetRange = useCallback(async () => {
     try {
       dispatch({ type: ACTION_TYPES.RESET_RANGE });
-      await saveRangeToStorage(state.selectedPosition, {});
+      if (state.isEditMode) {
+        await saveRangeToStorage(state.selectedPosition, {});
+      }
     } catch (error) {
       dispatch({
         type: ACTION_TYPES.SET_ERROR,
         payload: `Failed to reset range: ${error.message}`,
       });
     }
-  }, [state.selectedPosition]);
+  }, [state.selectedPosition, state.isEditMode]);
 
   const undo = useCallback(async () => {
     try {
@@ -398,13 +461,17 @@ export const RangeProvider = ({ children }) => {
   }, [state.selectedPosition, state.history]);
 
   const canUndo = useCallback(
-    () => (state.history[state.selectedPosition]?.length ?? 0) > 0,
-    [state.history, state.selectedPosition]
+    () =>
+      state.isEditMode &&
+      (state.history[state.selectedPosition]?.length ?? 0) > 0,
+    [state.history, state.selectedPosition, state.isEditMode]
   );
 
   const canRedo = useCallback(
-    () => (state.redoHistory[state.selectedPosition]?.length ?? 0) > 0,
-    [state.redoHistory, state.selectedPosition]
+    () =>
+      state.isEditMode &&
+      (state.redoHistory[state.selectedPosition]?.length ?? 0) > 0,
+    [state.redoHistory, state.selectedPosition, state.isEditMode]
   );
 
   const redo = useCallback(async () => {
@@ -475,6 +542,15 @@ export const RangeProvider = ({ children }) => {
     [copiedRange]
   );
 
+  // New edit mode functions
+  const toggleEditMode = useCallback(() => {
+    dispatch({ type: ACTION_TYPES.TOGGLE_EDIT_MODE });
+  }, []);
+
+  const setEditMode = useCallback(isEdit => {
+    dispatch({ type: ACTION_TYPES.SET_EDIT_MODE, payload: isEdit });
+  }, []);
+
   const value = {
     state,
     setSelectedPosition,
@@ -492,6 +568,9 @@ export const RangeProvider = ({ children }) => {
     pasteRange,
     copiedRange,
     canPaste: !!copiedRange?.range,
+    // New edit mode functions
+    toggleEditMode,
+    setEditMode,
   };
 
   return (

@@ -9,10 +9,11 @@ export default function GridCell({
   onMouseDown,
   onMouseEnter,
   onMouseUp,
+  isEditable = true, // New prop to control editability
 }) {
   const isPocketPair = hand.length === 2 && hand[0] === hand[1];
 
-  const baseClass = 'grid-cell select-none';
+  const baseClass = 'grid-cell select-none transition-all duration-150';
 
   // Get background color
   let bgStyle = {};
@@ -38,13 +39,28 @@ export default function GridCell({
 
   const textSizeClass = 'text-[8px] xxs:text-[9px] xs:text-[10px] sm:text-sm'; // Responsive text sizing
 
+  // Conditional event handlers and styling based on editability
+  const eventHandlers = isEditable
+    ? {
+        onMouseDown,
+        onMouseEnter,
+        onMouseUp,
+      }
+    : {};
+
+  // Cursor and interaction styling
+  const cursorClass = isEditable ? 'cursor-pointer' : 'cursor-default';
+
   return (
     <div
-      className={`${baseClass} ${bgClass} ${textClass} ${textSizeClass}`}
+      className={`${baseClass} ${bgClass} ${textClass} ${textSizeClass} ${cursorClass}`}
       style={bgStyle}
-      onMouseDown={onMouseDown}
-      onMouseEnter={onMouseEnter}
-      onMouseUp={onMouseUp}
+      {...eventHandlers}
+      title={
+        !isEditable && action
+          ? `${hand} (${action}) - Switch to Edit Mode to modify`
+          : undefined
+      }
     >
       <span>{hand}</span>
     </div>
