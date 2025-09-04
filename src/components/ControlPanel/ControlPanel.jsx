@@ -20,7 +20,7 @@ export default function ControlPanel() {
 
       {/* VIEW MODE: Show minimal message */}
       {!isEditMode && (
-        <div className="text-center py-8">
+        <div className="text-center py-8 animate-fade-in">
           <div className="text-gray-500 text-sm mb-2">
             👁️ <strong>View Mode</strong>
           </div>
@@ -34,7 +34,7 @@ export default function ControlPanel() {
 
       {/* EDIT MODE: Show full control panel */}
       {isEditMode && (
-        <>
+        <div className="animate-fade-in">
           {/* Actions */}
           <div className="mb-6">
             <h2 className="text-lg font-semibold mb-3">Actions</h2>
@@ -49,7 +49,7 @@ export default function ControlPanel() {
               <RangeControls />
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

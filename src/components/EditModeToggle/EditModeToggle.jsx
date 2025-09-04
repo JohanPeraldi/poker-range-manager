@@ -13,7 +13,7 @@ export default function EditModeToggle() {
   return (
     <button
       onClick={toggleEditMode}
-      className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 font-medium ${
+      className={`flex items-center gap-2 px-3 py-2 rounded-lg mode-toggle-button font-medium ${
         isEditMode
           ? 'bg-blue-100 text-blue-700 hover:bg-blue-200 ring-2 ring-blue-300'
           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -22,17 +22,12 @@ export default function EditModeToggle() {
       aria-label={isEditMode ? 'Switch to View Mode' : 'Switch to Edit Mode'}
       aria-pressed={isEditMode}
     >
-      {isEditMode ? (
-        <>
-          <Lock size={16} />
-          <span className="text-sm">Lock Ranges</span>
-        </>
-      ) : (
-        <>
-          <Edit3 size={16} />
-          <span className="text-sm">Edit Ranges</span>
-        </>
-      )}
+      <div className="transition-transform duration-200 ease-in-out">
+        {isEditMode ? <Lock size={14} /> : <Edit3 size={14} />}
+      </div>
+      <span className="text-xs sm:text-sm transition-colors duration-200">
+        {isEditMode ? 'Lock Ranges' : 'Edit Ranges'}
+      </span>
     </button>
   );
 }
